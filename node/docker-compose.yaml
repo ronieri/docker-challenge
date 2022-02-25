@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  db:
+    build: 
+      context: ./db
+      dockerfile: Dockerfile
+    image: ronieri/db-docker
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=nodeapp
+    networks:
+      - nodenetwork
+  nodeapp:
+    build: 
+      context: ./node-app
+      dockerfile: Dockerfile
+    image: ronieri/node-docker
+    container_name: nodeapp
+    networks: 
+      - nodenetwork
+    depends_on:
+      - db
+  nginx:
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: ronieri/nginx-docker
+    container_name: nginx
+    networks: 
+      - nodenetwork
+    ports: 
+      - "8080:80"
+    depends_on:
+      - nodeapp
+networks:
+  nodenetwork:
+    driver: bridge
